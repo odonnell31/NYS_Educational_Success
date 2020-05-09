@@ -13,41 +13,41 @@ import pandas as pd
 
 ########### Define your variables ######
 
-tabtitle = 'DC Housing'
-myheading='Analysis of housing prices in Washington DC'
-neighborhood='Columbia Heights'
+tabtitle = 'NYS Teacher Pay vs Student Success by School District'
+myheading='Analysis of teachers salaries vs students educational success in New York State'
+#neighborhood='Columbia Heights'
 color1='#04F9E6'
 color2='#1B03B1'
-sourceurl = 'https://www.kaggle.com/christophercorrea/dc-residential-properties/'
-githublink = 'https://github.com/austinlasseter/dash-scatterplot-housing'
-image_name = 'dc-flag.jpg'
+githublink = 'https://github.com/odonnell31/NYS_Educational_Success'
+sourceurl = 'https://data.nysed.gov/downloads.php'
+#image_name = 'dc-flag.jpg'
 
 ########### Prepare the dataframe
-df = pd.read_csv('DC_Properties.csv')
-df=df[df['ASSESSMENT_NBHD']==neighborhood]
-df=df[df['LANDAREA']<4000]
-df=df[df['PRICE']<900000 & (df['PRICE']>=10000)]
-df=df[df['BEDRM']<8]
+df = pd.read_csv('data/Merged_dataset/NYS_Education_2019_v2.csv')
+#df=df[df['ASSESSMENT_NBHD']==neighborhood]
+#df=df[df['LANDAREA']<4000]
+#df=df[df['PRICE']<900000 & (df['PRICE']>=10000)]
+#df=df[df['BEDRM']<8]
 
 ########### Set up the chart
 trace = go.Scatter(
-    x = df['PRICE'],
-    y = df['LIVING_GBA'],
+    x = df['Median_Teachers_Pay'],
+    y = df['Graduation_Rate'],
     mode = 'markers',
     marker=dict(
         size=8,
-        color = df['BEDRM'], # set color equal to a third variable
+        color = df['District_description'], # set color equal to a third variable
         colorscale=[color1, color2],
-        colorbar=dict(title='Bedrooms'),
+        colorbar=dict(title='District_description'),
         showscale=True
     )
 )
 
 data = [trace]
 layout = go.Layout(
-    title = f'Larger homes cost more in {neighborhood}!', # Graph title
-    xaxis = dict(title = 'Sales Price'), # x-axis label
-    yaxis = dict(title = 'Square Feet'), # y-axis label
+    title = f'NYS Teacher Pay vs Student Success by School District', # Graph title
+    xaxis = dict(title = 'Median Teacher Salary ($)'), # x-axis label
+    yaxis = dict(title = 'Student Graduation Rate'), # y-axis label
     hovermode ='closest' # handles multiple points landing on the same vertical
 )
 fig = go.Figure(data=data, layout=layout)

@@ -23,7 +23,7 @@ sourceurl = 'https://data.nysed.gov/downloads.php'
 #image_name = 'dc-flag.jpg'
 
 ########### Prepare the dataframe
-df = pd.read_csv('data/Merged_dataset/NYS_Education_2019_v2.csv')
+df = pd.read_csv('data/Merged_dataset/NYS_Education_2019_v3.csv')
 #df=df[df['ASSESSMENT_NBHD']==neighborhood]
 #df=df[df['LANDAREA']<4000]
 #df=df[df['PRICE']<900000 & (df['PRICE']>=10000)]
@@ -36,7 +36,8 @@ trace = go.Scatter(
     mode = 'markers',
     marker=dict(
         size=8,
-        color = df['District_description'], # set color equal to a third variable
+        color = color1, # set color equal to a third variable
+        #color = df['District_description'], # set color equal to a third variable
         colorscale=[color1, color2],
         colorbar=dict(title='District_description'),
         showscale=True

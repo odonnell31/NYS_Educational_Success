@@ -7,6 +7,7 @@ Created on Sun May 10 11:50:23 2020
 
 # import libraries
 import dash
+import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
@@ -43,24 +44,17 @@ app.layout = html.Div([
                 value='Graduation_Rate'
             )
             
-            #dcc.RadioItems(
-            #    id='crossfilter-yaxis-type',
-            #    options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-            #    value='Linear',
-            #    labelStyle={'display': 'inline-block'}
-            #)
-            
         ],
         style={'width': '49%', 'display': 'inline-block'}),
         
         # top right dropdown for single school district
-        html.Div([
-            dcc.Dropdown(
-                id='crossfilter-school-district',
-                options=[{'label': i, 'value': i} for i in df['School_district'].unique()]
-                #value='SACHEM CENTRAL SCHOOL DISTRICT'
-            )
-        ], style={'width': '49%', 'float': 'right', 'display': 'inline-block'})
+        #html.Div([
+        #    dcc.Dropdown(
+        #        id='crossfilter-school-district',
+        #        options=[{'label': i, 'value': i} for i in df['School_district'].unique()],
+        #        value='SACHEM CENTRAL SCHOOL DISTRICT'
+        #    )
+        #], style={'width': '49%', 'float': 'right', 'display': 'inline-block'})
     ], style={
         'borderBottom': 'thin lightgrey solid',
         'backgroundColor': 'rgb(250, 250, 250)',
@@ -70,17 +64,21 @@ app.layout = html.Div([
     # scatter plot
     html.Div([
         dcc.Graph(
-            id='crossfilter-scatter'
-            #hoverData={'points': [{'customdata': 'SACHEM CENTRAL SCHOOL DISTRICT'}]}
+            id='crossfilter-scatter',
+            hoverData={'points': [{'customdata': 'School_district'}]}
         )
-    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
+    ], style={'width': '90%', 'display': 'inline-block', 'padding': '0 20'}),
     html.Div([
-        dcc.Textarea(id='school-district-id'),
-        dcc.Textarea(id='school-district-kpi'),
-        html.A('Code on Github', href='https://github.com/odonnell31/NYS_Educational_Success'),
-        html.Br(),
-        html.A("Data Source", href='https://data.nysed.gov/downloads.php')
-    ], style={'display': 'inline-block', 'width': '49%'})
+        dash_table.DataTable(id='school-district-table',
+                             columns = [{"name": 'School_district', "id": 'School_district'},
+                                        {"name": 'Disctrict_description', "id": 'District_description'},
+                                        {"name": 'Graduation_count', "id": 'Graduation_count'},
+                                        {"name": 'Median_Teachers_Pay', "id": 'Median_Teachers_Pay'}])
+        #dcc.Textarea(id='school-district-kpi')
+        #html.A('Code on Github', href='https://github.com/odonnell31/NYS_Educational_Success'),
+        #html.Br(),
+        #html.A("Data Source", href='https://data.nysed.gov/downloads.php')
+    ], style={'display': 'inline-block', 'width': '90%', 'padding': '0 20'})
 
 
 
@@ -99,22 +97,22 @@ def update_graph(yaxis_column_name):
 
     return {
         'data': [dict(
-            #x = [0,1,2,3],
             x = dff['Median_Teachers_Pay'].values,
             y = dff[yaxis_column_name].values,
-            text = str(yaxis_column_name),
-            #customdata = dff['School_district'],
+            text = dff['School_district'],
+            customdata = dff['School_district'],
             mode='markers',
             marker={
-                'size': 15,
-                'opacity': 0.5,
+                'size': 12,
+                'opacity': 0.4,
                 'line': {'width': 0.5, 'color': 'white'}
             }
+            #name = dff['School_district'].values,
+            #hover_data = dff['School_district'].values
         )],
         'layout': dict(
             xaxis={
                 'title': 'Median Teachers Salary'
-                #'type': 'linear' if xaxis_type == 'Linear' else 'log'
             },
             yaxis={
                 'title': yaxis_column_name
@@ -122,9 +120,30 @@ def update_graph(yaxis_column_name):
             },
             margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
             height=450,
-            hovermode='closest'
+            hovermode='closest',
+            trendline = 'lowess'
+            
         )
     }
+
+@app.callback(
+    dash.dependencies.Output('school-district-table', 'data'),
+    [dash.dependencies.Input('crossfilter-scatter', 'hoverData')]
+)
+def update_table(hoverData):
+    school_district_hover = hoverData['points'][0]['customdata']
+    
+    school_district_data = df[df['School_district'] == school_district_hover]
+
+    #soql_url = ('http://data.cityofnewyork.us/resource/nwxe-4ae8.json?' +\
+    #        '$select=health,count(tree_id)' +\
+    #        '&$where=boroname=\'' + boro + '\'' +\
+    #        '&$group=health').replace(' ', '%20')
+
+    #soql_trees = pd.read_json(soql_url)
+    
+    #return soql_trees.to_dict('records')
+    return school_district_data.to_dict('records')
 
 """
 @app.callback(

@@ -24,10 +24,6 @@ sourceurl = 'https://data.nysed.gov/downloads.php'
 
 ########### Prepare the dataframe
 df = pd.read_csv('data/Merged_dataset/NYS_Education_2019_v3.csv')
-#df=df[df['ASSESSMENT_NBHD']==neighborhood]
-#df=df[df['LANDAREA']<4000]
-#df=df[df['PRICE']<900000 & (df['PRICE']>=10000)]
-#df=df[df['BEDRM']<8]
 
 ########### Set up the chart
 trace = go.Scatter(
